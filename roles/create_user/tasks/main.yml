@@ -1,0 +1,28 @@
+---
+# Create_user role deploys system user. User can do sudo without password
+# variables are taken from playbook
+
+- name: Create user
+  ansible.builtin.user:
+    name: "{{ CREATED_USERNAME }}"
+    comment: User for testing purposes
+    uid: 2500
+    group: sudo
+    password: "{{ CREATED_USERNAME_PASSWORD | password_hash('sha512', 'salt') }}"
+    create_home: true
+    shell: /bin/bash
+    
+- name: Add pubkeys to authorized_keys
+  authorized_key:
+    user: "{{ CREATED_USERNAME }}"
+    state: present
+    key: '{{ item }}'
+  with_file:
+    - 'authorized_key1.pub'
+    - 'authorized_key2.pub'
+
+- name: Copy sudo file for user
+  ansible.builtin.copy:
+    dest: /etc/sudoers.d/xitest
+    content: "xitest ALL=(ALL) NOPASSWD:ALL"
+    mode: 0440

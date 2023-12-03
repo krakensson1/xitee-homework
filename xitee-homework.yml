@@ -1,0 +1,49 @@
+---
+- name: xitee
+  hosts: all
+  become: yes
+  become_method: sudo
+  vars:
+
+    ## create_user role variables ###
+    CREATED_USERNAME: xitest
+    CREATED_USERNAME_PASSWORD: pasx.123
+
+    ### docker role variables ###
+    DOCKER_COMPOSE_DEST: /opt/docker-compose.yml
+    # wordpress env variables for docker-compose template
+    WORDPRESS_DB_HOST: db
+    WORDPRESS_DB_USER: exampleuser
+    WORDPRESS_DB_PASSWORD: examplepass
+    WORDPRESS_DB_NAME: exampledb
+    # wordpress container variables for docker-compose template
+    WP_CONTAINER_NAME: wordpress_container
+    WP_IMAGE_NAME: wordpress
+    WP_RESTART: always
+    WP_PORTS: 80:80
+    WP_VOLUME_TYPE: volume
+    WP_VOLUME_SOURCE: wordpress
+    WP_VOLUME_TARGET: /var/www/html
+    # mysql env variables for docker-compose template
+    MYSQL_DATABASE: exampledb
+    MYSQL_USER: exampleuser
+    MYSQL_PASSWORD: examplepass
+    MYSQL_ROOT_PASSWORD: verysecurepassword
+    # mysql container variables for docker-compose template
+    MYSQL_CONTAINER_NAME: mysql_container
+    MYSQL_IMAGE_NAME: mysql:5.7
+    MYSQL_RESTART: always
+    MYSQL_VOLUME_TYPE: volume
+    MYSQL_VOLUME_SOURCE: db
+    MYSQL_VOLUME_TARGET: /var/lib/mysql
+
+    ### backup role variables ###
+    BACKUP_SCRIPT_DEST: /opt/docker_backup.sh
+    BACKUP_CRON_DEST: /etc/cron.d/docker_backup
+    BACKUP_DIR: /var/docker_backups
+ 
+  roles:
+    - role: firewall
+    - role: create_user
+    - role: docker
+    - role: backup

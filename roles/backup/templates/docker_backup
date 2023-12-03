@@ -1,0 +1,1 @@
+0 8,16,0 * * * root {{ BACKUP_SCRIPT_DEST }}

@@ -1,0 +1,62 @@
+---
+# Firewall role deploys basic iptables set of rules
+
+### We need to allow local connectons
+- name: Allow INPUT loopback
+  ansible.builtin.iptables:
+    chain: INPUT
+    in_interface: lo
+    jump: ACCEPT
+
+- name: Allow OUTPUT loopback
+  ansible.builtin.iptables:
+    chain: OUTPUT
+    out_interface: lo
+    jump: ACCEPT
+###
+
+### We want to allow ICMP protocol thus host will be pingable
+- name: Allow specific ICMP types
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: icmp
+    icmp_type: "{{ item }}"
+    jump: ACCEPT
+  with_items: [ '0', '3', '8', '11' ]
+
+- name: Drop other IMCP types
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: icmp
+    jump: DROP
+
+- name: Allow outgoing ICMP
+  ansible.builtin.iptables:
+    chain: OUTPUT
+    protocol: icmp
+    jump: ACCEPT
+###
+
+### We need to allow related and established connections and specific ports for incoming connections
+- name: Allow related and established connections
+  ansible.builtin.iptables:
+    chain: INPUT
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+
+- name: Allow connections on multiple ports
+  ansible.builtin.iptables:
+    chain: INPUT
+    protocol: tcp
+    destination_ports:
+      - "80"
+      - "22"
+    jump: ACCEPT
+###
+
+### Drop everything what is not allowed
+- name: Set policy for the INPUT chain to DROP
+  ansible.builtin.iptables:
+    chain: INPUT
+    policy: DROP
+###

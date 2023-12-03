@@ -1,0 +1,21 @@
+---
+# Backup role deploys backup bash script and cron file
+# variables are taken from playbook
+
+- name: Create backup folder
+  ansible.builtin.file:
+    path: "{{ BACKUP_DIR }}"
+    state: directory
+    mode: '700'
+
+- name: Generate and store backup script from template
+  ansible.builtin.template:
+    src: 'docker_backup.sh'
+    dest: "{{ BACKUP_SCRIPT_DEST }}"
+    mode: '700'
+
+- name: Generate and store cron file from template
+  ansible.builtin.template:
+    src: 'docker_backup'
+    dest: "{{ BACKUP_CRON_DEST }}"
+    mode: '644'

@@ -1,0 +1,39 @@
+version: '3.1'
+
+services:
+
+  wordpress:
+    depends_on:
+      - db
+    container_name: {{ WP_CONTAINER_NAME }}
+    image: {{ WP_IMAGE_NAME }}
+    restart: {{ WP_RESTART }}
+    ports:
+      - {{ WP_PORTS }}
+    environment:
+      WORDPRESS_DB_HOST: {{ WORDPRESS_DB_HOST }}
+      WORDPRESS_DB_USER: {{ WORDPRESS_DB_USER }}
+      WORDPRESS_DB_PASSWORD: {{ WORDPRESS_DB_PASSWORD }}
+      WORDPRESS_DB_NAME: {{ WORDPRESS_DB_NAME }}
+    volumes:
+      - type: {{ WP_VOLUME_TYPE }}
+        source: {{ WP_VOLUME_SOURCE }}
+        target: {{ WP_VOLUME_TARGET }}
+
+  db:
+    container_name: {{ MYSQL_CONTAINER_NAME }}
+    image: {{ MYSQL_IMAGE_NAME }}
+    restart: {{ MYSQL_RESTART }}
+    environment:
+      MYSQL_DATABASE: {{ MYSQL_DATABASE }}
+      MYSQL_USER: {{ MYSQL_USER }}
+      MYSQL_PASSWORD: {{ MYSQL_PASSWORD }}
+      MYSQL_ROOT_PASSWORD: {{ MYSQL_ROOT_PASSWORD }}
+    volumes:
+      - type: {{ MYSQL_VOLUME_TYPE }}
+        source: {{ MYSQL_VOLUME_SOURCE }}
+        target: {{ MYSQL_VOLUME_TARGET }}
+
+volumes:
+  {{ WP_VOLUME_SOURCE }}:
+  {{ MYSQL_VOLUME_SOURCE }}:

@@ -1,0 +1,53 @@
+---
+# Docker role installs Docker and deploys docker-compose and containers
+# variables are taken from playbook
+
+- name: Update apt cache and install dependencies
+  apt:
+    state: present
+    update_cache: true
+    pkg:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+
+- name: Add repository key
+  apt_key:
+    state: present
+    url: https://download.docker.com/linux/ubuntu/gpg
+
+- name: Add Docker repository
+  apt_repository:
+    state: present
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    filename: docker
+
+- name: Install Docker packages and other necessities to run docker-compose
+  apt:
+    state: present
+    pkg:
+      - docker-ce
+      - docker-compose
+      - python3-docker
+
+- name: Ensure Docker is running
+  ansible.builtin.service:
+    state: started
+    name: docker
+
+- name: Generate and store docker-compose file from template
+  ansible.builtin.template:
+    src: 'docker-compose.yml'
+    dest: "{{ DOCKER_COMPOSE_DEST }}"
+    owner: root
+    group: root
+    mode: '600'
+
+- name: Create and start services
+  community.docker.docker_compose:
+    project_src: /opt
+    files:
+    - docker-compose.yml
+  register: output   
+
